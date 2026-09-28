@@ -1,0 +1,16 @@
+{
+  "name": "@amc/cli",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "amc": "./src/main.ts"
+  },
+  "scripts": {
+    "build": "bun build.ts"
+  },
+  "dependencies": {
+    "@amc/shared": "workspace:*"
+  }
+}

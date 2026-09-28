@@ -1,0 +1,66 @@
+name: Bug report
+description: Something in Mission Control is not working
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Security problems go through the [security policy](https://github.com/dannyhawkins/agent-mission-control/security/policy), not here.
+        Please remove anything private (paths, prompts, tokens) from logs before pasting.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. amc wire . --gate
+        2. Start claude in that project and ask it to run a Bash command
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: amc-version
+    attributes:
+      label: amc version
+      description: Output of `amc --version`
+    validations:
+      required: true
+  - type: input
+    id: claude-version
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - macOS (Apple silicon)
+        - macOS (Intel)
+        - Linux (x64)
+        - Linux (arm64)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: amc doctor output
+      description: Output of `amc doctor` run in the affected project. It never prints secrets.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Hub log or screenshots
+      description: Optional. Relevant lines from the hub's output (run with `AMC_LOG=debug` for more detail).
+      render: text

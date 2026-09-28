@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Superseded PR runs are cancelled; every push to main runs to completion.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.x
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+
+      - run: bun install --frozen-lockfile
+
+      - name: Biome
+        run: bunx biome ci .
+
+      - name: Typecheck
+        run: bunx tsc -b
+
+      - name: Test with coverage
+        run: bun test --coverage
+
+      - name: Coverage gate
+        run: bun scripts/coverage-gate.ts
+
+      - name: Build web UI
+        working-directory: apps/web
+        run: bun run build
+
+      # The compiled binary must boot and serve its embedded UI, not just compile.
+      - name: Build and smoke-test the amc binary
+        run: |
+          bun apps/cli/build.ts
+          ./dist/amc --version
+          AMC_DATA_DIR="$RUNNER_TEMP/amc-data" ./dist/amc start --port 47420 &
+          for i in $(seq 1 50); do curl -sf http://127.0.0.1:47420/api/health && break; sleep 0.2; done
+          curl -sf http://127.0.0.1:47420/ | grep -q '<div id="root">'
+          kill %1

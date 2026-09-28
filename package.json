@@ -1,0 +1,23 @@
+{
+  "name": "agent-mission-control",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "typecheck": "tsc -b"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "@types/bun": "^1.4.2",
+    "bun-types": "^1.4.2",
+    "lefthook": "latest",
+    "typescript": "latest"
+  }
+}

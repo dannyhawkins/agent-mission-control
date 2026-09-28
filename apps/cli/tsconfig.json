@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "test",
+    "build.ts",
+    "../hub/src",
+    "../../packages/mcp-server/src",
+    "../../packages/shared/src",
+    "../../package.json"
+  ]
+}

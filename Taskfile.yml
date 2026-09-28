@@ -1,0 +1,108 @@
+version: "3"
+
+vars:
+  HUB_PORT: '{{.HUB_PORT | default "4242"}}'
+
+tasks:
+  default:
+    desc: List tasks
+    cmds: [task --list]
+
+  install:
+    desc: Install all workspace deps and git hooks
+    cmds:
+      - bun install
+      - bunx lefthook install
+
+  dev:
+    desc: Run hub + web dev server together (hub on :{{.HUB_PORT}}, web on :5173 proxying to hub)
+    deps: [dev:hub, dev:web]
+
+  dev:hub:
+    desc: Run the hub (hooks receiver, OTLP receiver, decision API, WebSocket) with watch
+    dir: apps/hub
+    cmds: [bun --watch src/index.ts]
+    env: { AMC_PORT: "{{.HUB_PORT}}" }
+
+  dev:web:
+    desc: Run the Vite dev server for the mission control UI
+    dir: apps/web
+    cmds: [bun run dev]
+
+  build:
+    desc: Build the web UI into apps/web/dist (served by the hub in prod mode)
+    dir: apps/web
+    cmds: [bun run build]
+
+  start:
+    desc: Build the UI then run the hub serving it on :{{.HUB_PORT}}
+    deps: [build]
+    dir: apps/hub
+    cmds: [bun src/index.ts]
+    env: { AMC_PORT: "{{.HUB_PORT}}" }
+
+  build:bin:
+    desc: Build the amc binary for this platform into dist/amc (UI embedded)
+    deps: [build]
+    cmds: ["bun apps/cli/build.ts {{.CLI_ARGS}}"]
+
+  build:bin:all:
+    desc: Build amc for darwin-arm64, darwin-x64, linux-x64 and linux-arm64 into dist/amc-<os>-<arch>
+    deps: [build]
+    cmds: [bun apps/cli/build.ts --all]
+
+  lint:
+    desc: Biome check
+    cmds: [bunx biome check .]
+
+  lint:fix:
+    desc: Biome check with autofix
+    cmds: [bunx biome check --write .]
+
+  typecheck:
+    desc: TypeScript project references build (no emit)
+    cmds: [bunx tsc -b]
+
+  test:
+    desc: Run all tests
+    cmds: [bun test]
+
+  test:coverage:
+    desc: Run all tests with coverage and enforce the aggregate gate (what CI runs)
+    cmds:
+      - bun test --coverage
+      - bun scripts/coverage-gate.ts
+
+  check:
+    desc: Lint + typecheck + test
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
+
+  wire:
+    desc: Print what wiring the current project (or DIR=...) would add (add -- --write [--local] [--gate] to apply; same as amc wire from source)
+    cmds: ["bun scripts/wire.ts {{.DIR}} {{.CLI_ARGS}}"]
+
+  unwire:
+    desc: Remove everything wire.ts added to DIR=... (hooks, env, MCP server, CLAUDE.md snippet), shared or --local
+    requires: { vars: [DIR] }
+    cmds: ["bun scripts/wire.ts {{.DIR}} --unwire"]
+
+  wire:global:
+    desc: Wire every project at once (~/.claude/settings.json hooks + env, user-scope MCP server). Add -- --gate, --gate-questions-only or --snippet
+    cmds: ["bun scripts/wire.ts --global --write {{.CLI_ARGS}}"]
+
+  unwire:global:
+    desc: Remove the global wiring (backs up ~/.claude/settings.json first)
+    cmds: ["bun scripts/wire.ts --global --unwire {{.CLI_ARGS}}"]
+
+  sim:
+    desc: Simulate 3 fake Claude sessions against the hub to demo the UI (add -- --once to auto-exit after the decision is answered)
+    cmds: ["bun scripts/dev-sim.ts {{.CLI_ARGS}}"]
+    env: { AMC_HUB_URL: "http://127.0.0.1:{{.HUB_PORT}}" }
+
+  mcp:
+    desc: Run the mission-control MCP server on stdio (for poking at it with an MCP inspector)
+    cmds: [bun apps/cli/src/main.ts mcp]
+    env: { AMC_HUB_URL: "http://127.0.0.1:{{.HUB_PORT}}" }

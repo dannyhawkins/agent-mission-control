@@ -1,0 +1,302 @@
+{
+  "favicon-32": {
+    "file": "favicon-32.png",
+    "w": 16,
+    "h": 16,
+    "scale": 2
+  },
+  "favicon": {
+    "file": "favicon.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "logo-emblem": {
+    "file": "logo-emblem.png",
+    "w": 24,
+    "h": 24,
+    "scale": 8
+  },
+  "logo-emblem-2c": {
+    "file": "logo-emblem-2c.png",
+    "w": 24,
+    "h": 24,
+    "scale": 8
+  },
+  "warning-lamp-off": {
+    "file": "warning-lamp-off.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "warning-lamp-dim": {
+    "file": "warning-lamp-dim.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "warning-lamp-bright": {
+    "file": "warning-lamp-bright.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "warning-lamp-rays": {
+    "file": "warning-lamp-rays.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "warning-lamp-sheet": {
+    "file": "warning-lamp-sheet.png",
+    "w": 64,
+    "h": 16,
+    "scale": 8
+  },
+  "klaxon-idle": {
+    "file": "klaxon-idle.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "klaxon-blare": {
+    "file": "klaxon-blare.png",
+    "w": 16,
+    "h": 16,
+    "scale": 8
+  },
+  "klaxon-sheet": {
+    "file": "klaxon-sheet.png",
+    "w": 32,
+    "h": 16,
+    "scale": 8
+  },
+  "badge-working-0": {
+    "file": "badge-working-0.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-working-1": {
+    "file": "badge-working-1.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-working-2": {
+    "file": "badge-working-2.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-working-3": {
+    "file": "badge-working-3.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-waiting-decision": {
+    "file": "badge-waiting-decision.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-waiting-permission": {
+    "file": "badge-waiting-permission.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-idle-0": {
+    "file": "badge-idle-0.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-idle-1": {
+    "file": "badge-idle-1.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badge-offline": {
+    "file": "badge-offline.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "badges-sheet": {
+    "file": "badges-sheet.png",
+    "w": 72,
+    "h": 8,
+    "scale": 8
+  },
+  "audio-on": {
+    "file": "audio-on.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "audio-off": {
+    "file": "audio-off.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-0": {
+    "file": "crew-0.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-0-blink": {
+    "file": "crew-0-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-1": {
+    "file": "crew-1.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-1-blink": {
+    "file": "crew-1-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-2": {
+    "file": "crew-2.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-2-blink": {
+    "file": "crew-2-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-3": {
+    "file": "crew-3.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-3-blink": {
+    "file": "crew-3-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-4": {
+    "file": "crew-4.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-4-blink": {
+    "file": "crew-4-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-5": {
+    "file": "crew-5.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-5-blink": {
+    "file": "crew-5-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-6": {
+    "file": "crew-6.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-6-blink": {
+    "file": "crew-6-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-7": {
+    "file": "crew-7.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-7-blink": {
+    "file": "crew-7-blink.png",
+    "w": 12,
+    "h": 12,
+    "scale": 8
+  },
+  "crew-sheet": {
+    "file": "crew-sheet.png",
+    "w": 96,
+    "h": 24,
+    "scale": 8
+  },
+  "signal-cap-green": {
+    "file": "signal-cap-green.png",
+    "w": 4,
+    "h": 8,
+    "scale": 8
+  },
+  "signal-cap-amber": {
+    "file": "signal-cap-amber.png",
+    "w": 4,
+    "h": 8,
+    "scale": 8
+  },
+  "signal-cap-red": {
+    "file": "signal-cap-red.png",
+    "w": 4,
+    "h": 8,
+    "scale": 8
+  },
+  "signal-cap-cyan": {
+    "file": "signal-cap-cyan.png",
+    "w": 4,
+    "h": 8,
+    "scale": 8
+  },
+  "envelope": {
+    "file": "envelope.png",
+    "w": 8,
+    "h": 8,
+    "scale": 8
+  },
+  "stamp-small": {
+    "file": "stamp-small.png",
+    "w": 32,
+    "h": 32,
+    "scale": 8
+  },
+  "stamp-full": {
+    "file": "stamp-full.png",
+    "w": 32,
+    "h": 32,
+    "scale": 8
+  },
+  "stamp-sparkle": {
+    "file": "stamp-sparkle.png",
+    "w": 32,
+    "h": 32,
+    "scale": 8
+  },
+  "stamp-sheet": {
+    "file": "stamp-sheet.png",
+    "w": 96,
+    "h": 32,
+    "scale": 8
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@amc/hub",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@amc/shared": "workspace:*"
+  }
+}

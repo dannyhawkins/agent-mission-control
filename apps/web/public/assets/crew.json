@@ -1,0 +1,137 @@
+{
+  "sheet": "/assets/crew-sheet.png",
+  "scale": 8,
+  "frameWidth": 12,
+  "frameHeight": 12,
+  "columns": 8,
+  "rows": 2,
+  "frameNames": ["open", "blink"],
+  "greys": {
+    "outline": "#1a1a1f",
+    "light": "#d4d4dc",
+    "mid": "#8c8c98",
+    "dark": "#4c4c58"
+  },
+  "sprites": [
+    {
+      "index": 0,
+      "name": "cap",
+      "svg": ["/assets/crew-0.svg", "/assets/crew-0-blink.svg"],
+      "frames": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "name": "mohawk",
+      "svg": ["/assets/crew-1.svg", "/assets/crew-1-blink.svg"],
+      "frames": [
+        {
+          "x": 12,
+          "y": 0
+        },
+        {
+          "x": 12,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "bun",
+      "svg": ["/assets/crew-2.svg", "/assets/crew-2-blink.svg"],
+      "frames": [
+        {
+          "x": 24,
+          "y": 0
+        },
+        {
+          "x": 24,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "helmet",
+      "svg": ["/assets/crew-3.svg", "/assets/crew-3-blink.svg"],
+      "frames": [
+        {
+          "x": 36,
+          "y": 0
+        },
+        {
+          "x": 36,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "antenna",
+      "svg": ["/assets/crew-4.svg", "/assets/crew-4-blink.svg"],
+      "frames": [
+        {
+          "x": 48,
+          "y": 0
+        },
+        {
+          "x": 48,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "glasses",
+      "svg": ["/assets/crew-5.svg", "/assets/crew-5-blink.svg"],
+      "frames": [
+        {
+          "x": 60,
+          "y": 0
+        },
+        {
+          "x": 60,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "name": "hood",
+      "svg": ["/assets/crew-6.svg", "/assets/crew-6-blink.svg"],
+      "frames": [
+        {
+          "x": 72,
+          "y": 0
+        },
+        {
+          "x": 72,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "name": "goggles",
+      "svg": ["/assets/crew-7.svg", "/assets/crew-7-blink.svg"],
+      "frames": [
+        {
+          "x": 84,
+          "y": 0
+        },
+        {
+          "x": 84,
+          "y": 12
+        }
+      ]
+    }
+  ]
+}

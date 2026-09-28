@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an idea for Mission Control
+labels: [idea]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New requests start as `idea` (proposed, not yet agreed). Once the shape is agreed the label becomes `enhancement` or `design`.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What you would like to happen. Sketches and screenshots welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Other ways you thought about, and workarounds you use now.
+  - type: checkboxes
+    id: undocumented
+    attributes:
+      label: Claude Code behaviour
+      options:
+        - label: This would rely on Claude Code behaviour that is not documented

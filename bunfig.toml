@@ -1,0 +1,15 @@
+[test]
+# Coverage is gated in aggregate by scripts/coverage-gate.ts (task test:coverage,
+# run in CI), not by coverageThreshold: Bun applies coverageThreshold to each
+# file on its own, so any single untested file fails the run.
+#
+# Bun only measures files that some test actually loads, so test/all-modules.test.ts
+# imports every source module; an untested file then counts at 0% instead of
+# vanishing from the report.
+coverageSkipTestFiles = true
+coverageReporter = ["text", "lcov"]
+coverageDir = "coverage"
+# Shared test helpers are not product code.
+coveragePathIgnorePatterns = ["**/test/**"]
+# happy-dom globals for React component tests (keeps Bun's own fetch, timers, streams).
+preload = ["./apps/web/test/dom-setup.ts"]
