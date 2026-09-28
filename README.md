@@ -1,4 +1,8 @@
-# Agent Mission Control [![CI](https://github.com/dannyhawkins/agent-mission-control/actions/workflows/ci.yml/badge.svg)](https://github.com/dannyhawkins/agent-mission-control/actions/workflows/ci.yml)
+# Agent Mission Control
+
+[![CI](https://github.com/dannyhawkins/agent-mission-control/actions/workflows/ci.yml/badge.svg)](https://github.com/dannyhawkins/agent-mission-control/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/dannyhawkins/agent-mission-control?include_prereleases&label=release)](https://github.com/dannyhawkins/agent-mission-control/releases)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
 One screen for every Claude Code session on your machine.
 
@@ -19,7 +23,8 @@ ElevenLabs voice.
 Agent Mission Control is an independent project. It is not affiliated with, endorsed by or
 supported by Anthropic. It relies on some Claude Code behaviour that is not documented and may
 change in any release: the per-session messaging socket, `CLAUDE_CODE_SESSION_ID` in the MCP
-server's environment, and some hook payload fields. It is alpha software (0.x).
+server's environment, and some hook payload fields. It is alpha software: the current release is
+[v0.1.0](https://github.com/dannyhawkins/agent-mission-control/releases/tag/v0.1.0), and 0.x releases may change behaviour between versions.
 
 | Tested with | Status |
 | --- | --- |
@@ -85,6 +90,10 @@ open http://127.0.0.1:4242
 claude -c                       # restart each running session once so it loads the wiring
 ```
 
+Prefer a gentler start? `amc wire --global --gate-questions-only` routes only Claude's questions
+and plan approvals to the floor and leaves tool permission prompts in the terminal. Upgrade later
+with `brew upgrade amc`, then restart the hub when no cards are waiting.
+
 No Homebrew? Download the tarball for your platform from
 [GitHub Releases](https://github.com/dannyhawkins/agent-mission-control/releases) and check it
 against `SHA256SUMS`. [docs/install.md](docs/install.md) has the steps for each platform,
@@ -98,7 +107,7 @@ restart (`claude -c` resumes the conversation) because each session loads its MC
 it starts.
 
 The hub runs in the foreground of whatever terminal starts it; there is no login item yet
-([#2](https://github.com/dannyhawkins/agent-mission-control/issues/2)). After a reboot, run
+([#1](https://github.com/dannyhawkins/agent-mission-control/issues/1)). After a reboot, run
 `amc start` again. Its data lives in `~/.agent-mission-control` (`AMC_DATA_DIR`).
 
 **Upgrading from a checkout install.** Wiring made by `task wire*` before `amc` existed points
@@ -296,6 +305,20 @@ commit messages and pull requests.
 | `scripts` | `wire.ts` (the old flags, forwarded to `amc wire`), `dev-sim.ts` for simulated sessions, `render-formula.ts` for the Homebrew formula |
 | `packaging/homebrew` | Formula template the release workflow renders into the tap |
 | `apps/web/public/assets/_src/make.ts` | Source of every pixel-art asset |
+
+## Roadmap and ideas
+
+What is being considered next, tracked as issues. Comment on the ones you care about, or start a
+thread in [Discussions](https://github.com/dannyhawkins/agent-mission-control/discussions).
+
+- Start the hub on login, once it has proven stable in daily use ([#1](https://github.com/dannyhawkins/agent-mission-control/issues/1)).
+- A Claude Code plugin as a one-step install channel ([#3](https://github.com/dannyhawkins/agent-mission-control/issues/3)).
+- Custom per-persona voices with ElevenLabs Voice Design ([#5](https://github.com/dannyhawkins/agent-mission-control/issues/5)).
+- Hub-side voice with macOS `say`, so announcements work with the browser closed
+  ([#2](https://github.com/dannyhawkins/agent-mission-control/issues/2)).
+- An npm / `bunx` distribution ([#4](https://github.com/dannyhawkins/agent-mission-control/issues/4)).
+
+Bugs and feature requests: [open an issue](https://github.com/dannyhawkins/agent-mission-control/issues/new/choose).
 
 ## Further reading
 

@@ -197,7 +197,7 @@ export function createMockHub(dispatch: Dispatch): MockHub {
         statusLine: "PERMISSION REQUIRED FOR SHELL COMMAND. HOLDING.",
         blockedSince: ago(41_000),
         lastTool: "Bash",
-        // An agent team (#19): one teammate on a task, one on standby between tasks, plus a
+        // An agent team: one teammate on a task, one on standby between tasks, plus a
         // one-off subagent named from its spawning Agent call.
         crew: [
           member("amigrator-5d1e0c9b7a3f2e18", "teammate", "migrator", 7117, "working", {

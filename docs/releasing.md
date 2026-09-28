@@ -83,8 +83,6 @@ gh secret set HOMEBREW_TAP_TOKEN --repo dannyhawkins/agent-mission-control
 
 ## While the repositories are private
 
-Release assets of a private repository need authentication to download, and Homebrew fetches
-formula URLs anonymously. Until #12 makes this repository and the tap public,
-`brew install dannyhawkins/tap/amc` fails at the download for everyone, including us. The
-releases, tarballs and formula are still produced correctly, and a tarball can be fetched with
-`gh release download vX.Y.Z --repo dannyhawkins/agent-mission-control --pattern '*darwin-arm64*'`.
+Homebrew fetches formula URLs anonymously, so this repository and the tap must both stay
+public for `brew install dannyhawkins/tap/amc` to work. A tarball can also be fetched directly
+with `gh release download vX.Y.Z --repo dannyhawkins/agent-mission-control --pattern '*darwin-arm64*'`.

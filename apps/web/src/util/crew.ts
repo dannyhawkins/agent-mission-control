@@ -24,7 +24,7 @@ export function crewBusy(s: Session): boolean {
 /**
  * READY: finished its turn, nothing pending, and no crew still out. The hub already reports a
  * session with busy crew as "working"; checking here too keeps the badge, idle chime and the
- * "standing by" line honest against an older hub or a snapshot caught mid-update (#16).
+ * "standing by" line honest against an older hub or a snapshot caught mid-update.
  */
 export function isReady(s: Session, decisions: readonly Decision[]): boolean {
   return s.status === "idle" && decisions.length === 0 && !crewBusy(s);
