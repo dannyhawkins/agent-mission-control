@@ -1,12 +1,12 @@
 // Aggregate coverage gate over coverage/lcov.info (written by `bun test --coverage`).
 //
 // Why not bunfig's coverageThreshold: Bun applies it to every file separately, so
-// one untested file fails the run whatever the overall number is. The #8 target
+// one untested file fails the run whatever the overall number is. The target
 // is an overall percentage, so this sums LH/LF (and FNH/FNF) across all files.
 //
 // The defaults are the thresholds CI enforces. test/all-modules.test.ts loads every
 // source module, so these are over all product code, not just what tests touch
-// (measured 94.9% lines / 91.0% functions on 2026-09-25, #9).
+// (measured 94.9% lines / 91.0% functions on 2026-09-25).
 //
 // Usage: bun scripts/coverage-gate.ts [--lines 0.8] [--functions 0.85] [--file coverage/lcov.info]
 

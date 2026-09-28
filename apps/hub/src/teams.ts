@@ -3,7 +3,7 @@ import path from "node:path";
 
 /**
  * Read-only view of Claude Code agent teams, for keeping teammates on standby
- * exactly as long as they are still on their team (#19).
+ * exactly as long as they are still on their team.
  *
  * Observed on 2.1.281, and the reason the lookup goes through the meta file
  * rather than the roster alone:

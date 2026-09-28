@@ -130,7 +130,7 @@ Then:
 
 Not provided yet. The hub runs in the foreground of the terminal that starts it, so after a
 reboot run `amc start` again. Starting it at login is tracked in
-[#2](https://github.com/dannyhawkins/agent-mission-control/issues/2).
+[#1](https://github.com/dannyhawkins/agent-mission-control/issues/1).
 
 ## Uninstalling
 
