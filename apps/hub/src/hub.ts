@@ -158,7 +158,8 @@ export function createHub(config: HubConfig = loadConfig(), deps: HubDeps = {}):
   const emit = (ev: ServerEvent) => {
     // History rides on the event stream: every activity line is kept, and a
     // session's lines go with it.
-    if (ev.type === "activity") activity.add(ev.sessionId, { at: ev.at, line: ev.line });
+    if (ev.type === "activity")
+      activity.add(ev.sessionId, { at: ev.at, line: ev.line, target: ev.target });
     else if (ev.type === "session_removed") activity.drop(ev.sessionId);
     broadcaster.broadcast(ev);
   };

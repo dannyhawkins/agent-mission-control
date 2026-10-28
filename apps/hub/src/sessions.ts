@@ -119,9 +119,12 @@ const ACTIVITY_THROTTLE_MS = 250;
 
 export class SessionStore {
   private records = new Map<string, SessionRecord>();
-  private throttles = new Map<string, { timer: Timer; lines: { line: string; at: string }[] }>();
+  private throttles = new Map<
+    string,
+    { timer: Timer; lines: { line: string; at: string; target?: string }[] }
+  >();
   /** Last activity line per session, so heartbeats repeating it add nothing to history. */
-  private lastLine = new Map<string, string>();
+  private lastLine = new Map<string, { line: string; target?: string }>();
   private crewAsks = new Map<string, CrewAsk[]>();
   /** Main-thread Agent/Task calls not yet matched to their SubagentStart, per session, FIFO. */
   private spawns = new Map<string, { agentType: string; label: string; at: number }[]>();
@@ -435,7 +438,7 @@ export class SessionStore {
       case "SessionStart": {
         this.setHookStatus(rec, "working");
         if (typeof payload.model === "string" && payload.model) rec.session.model = payload.model;
-        rec.session.statusLine = say({ kind: "session_start" });
+        this.updateStatusLine(rec, say({ kind: "session_start" }));
         if (parent) this.attachChild(rec, parent);
         this.emitSession(rec);
         break;
@@ -447,7 +450,7 @@ export class SessionStore {
         const wasWaiting = rec.hookStatus === "waiting_permission";
         this.setHookStatus(rec, "waiting_permission", now);
         if (tool) rec.session.lastTool = tool;
-        rec.session.statusLine = say({ kind: "permission_prompt", tool });
+        this.updateStatusLine(rec, say({ kind: "permission_prompt", tool }));
         if (!wasWaiting && !isQuestionTool(tool))
           this.deps.log.add(p, "permission_prompt", rec.session.statusLine, { meta: { tool } });
         this.emitSession(rec);
@@ -456,7 +459,7 @@ export class SessionStore {
       case "UserPromptSubmit": {
         this.engage(rec);
         this.setHookStatus(rec, "working");
-        rec.session.statusLine = say({ kind: "prompt" });
+        this.updateStatusLine(rec, say({ kind: "prompt" }));
         this.emitSession(rec);
         break;
       }
@@ -476,12 +479,12 @@ export class SessionStore {
           rec.session.stats.toolCalls++;
           this.rememberSpawn(rec.session.id, tool, payload.tool_input);
           line = withTarget(say({ kind: "tool_start", tool }), target);
-          rec.session.statusLine = line;
+          this.updateStatusLine(rec, line, target);
         } else if (event === "PostToolUseFailure") {
           line = withTarget(`✗ ${tool} failed`, target);
         }
         if (wasBlocked) this.emitSession(rec);
-        this.emitActivity(rec, line);
+        this.emitActivity(rec, line, target);
         break;
       }
       case "Notification": {
@@ -492,7 +495,7 @@ export class SessionStore {
           const wasWaiting = rec.hookStatus === "waiting_permission";
           this.setHookStatus(rec, "waiting_permission", now);
           if (!wasWaiting) {
-            rec.session.statusLine = say({ kind: "permission_prompt", tool });
+            this.updateStatusLine(rec, say({ kind: "permission_prompt", tool }));
             this.deps.log.add(p, "permission_prompt", rec.session.statusLine, {
               meta: { message: payload.message },
             });
@@ -501,7 +504,7 @@ export class SessionStore {
           this.setHookStatus(rec, "idle", now);
           // With crew still out the session is not idle; derive() says so when they finish.
           if (!this.crewBusy(rec)) {
-            rec.session.statusLine = say({ kind: "idle" });
+            this.updateStatusLine(rec, say({ kind: "idle" }));
             this.deps.log.add(p, "idle", rec.session.statusLine);
           }
         } else {
@@ -522,7 +525,7 @@ export class SessionStore {
         const line = say({ kind: "stop" });
         // The turn did end (history keeps it), but "awaiting orders" would be wrong on
         // a station whose crew is still working.
-        if (!this.crewBusy(rec)) rec.session.statusLine = line;
+        if (!this.crewBusy(rec)) this.updateStatusLine(rec, line);
         this.deps.log.add(p, "stop", line);
         this.emitSession(rec);
         break;
@@ -534,7 +537,7 @@ export class SessionStore {
       case "SessionEnd": {
         this.setHookStatus(rec, "offline");
         this.retireCrew(rec, now);
-        rec.session.statusLine = say({ kind: "session_end" });
+        this.updateStatusLine(rec, say({ kind: "session_end" }));
         this.deps.log.add(p, "session_end", rec.session.statusLine, {
           meta: { reason: payload.reason },
         });
@@ -609,6 +612,7 @@ export class SessionStore {
 
     const before = rec.session.crew.find((c) => c.id === agentId)?.status;
     const m = this.upsertCrew(rec, agentId, role, now, true, label);
+    const target = tool ? toolTarget(tool, payload.tool_input, rec.session.cwd) : undefined;
     let line: string | undefined;
     let sessionChanged = before !== m.status;
 
@@ -617,10 +621,7 @@ export class SessionStore {
         m.toolCalls++;
         if (tool) m.lastTool = tool;
         if (isRequestDecisionTool(tool)) this.rememberCrewAsk(rec.session.id, who, payload);
-        line = withTarget(
-          say({ kind: "tool_start", tool: tool ?? "tool" }),
-          tool ? toolTarget(tool, payload.tool_input, rec.session.cwd) : undefined,
-        );
+        line = withTarget(say({ kind: "tool_start", tool: tool ?? "tool" }), target);
         break;
       }
       case "PostToolUse":
@@ -631,10 +632,7 @@ export class SessionStore {
           sessionChanged = true;
         }
         if (event === "PostToolUseFailure") {
-          line = withTarget(
-            `✗ ${tool ?? "tool"} failed`,
-            tool ? toolTarget(tool, payload.tool_input, rec.session.cwd) : undefined,
-          );
+          line = withTarget(`✗ ${tool ?? "tool"} failed`, target);
         }
         break;
       }
@@ -647,7 +645,7 @@ export class SessionStore {
         this.setHookStatus(rec, "waiting_permission", now);
         rec.permissionAgentId = agentId;
         if (!wasWaiting) {
-          rec.session.statusLine = `${role}: ${say({ kind: "permission_prompt", tool })}`;
+          this.updateStatusLine(rec, `${role}: ${say({ kind: "permission_prompt", tool })}`);
         }
         if (!wasWaiting && !isQuestionTool(tool)) {
           this.deps.log.add(p, "permission_prompt", rec.session.statusLine, {
@@ -674,7 +672,7 @@ export class SessionStore {
     }
 
     if (sessionChanged) this.emitSession(rec);
-    this.emitActivity(rec, line ? `${role}: ${line}` : undefined);
+    this.emitActivity(rec, line ? `${role}: ${line}` : undefined, target);
   }
 
   /**
@@ -1080,7 +1078,7 @@ export class SessionStore {
     const rec = this.records.get(id);
     if (!rec) return;
     rec.session.lastSeenAt = new Date().toISOString();
-    rec.session.statusLine = line;
+    this.updateStatusLine(rec, line);
     this.emitActivity(rec, line);
   }
 
@@ -1097,7 +1095,7 @@ export class SessionStore {
       this.setHookStatus(rec, "working");
       this.emitSession(rec);
     }
-    if (input.line) rec.session.statusLine = input.line;
+    if (input.line) this.updateStatusLine(rec, input.line);
     this.emitActivity(rec, rec.session.statusLine);
   }
 
@@ -1170,7 +1168,7 @@ export class SessionStore {
         const p = rec.session.persona;
         this.setHookStatus(rec, "offline");
         this.retireCrew(rec, new Date(now).toISOString());
-        rec.session.statusLine = phrase(p.voice, p.name, { kind: "lost_signal" });
+        this.updateStatusLine(rec, phrase(p.voice, p.name, { kind: "lost_signal" }));
         this.deps.log.add(p, "session_end", rec.session.statusLine, {
           meta: { reason: "silence" },
         });
@@ -1265,7 +1263,7 @@ export class SessionStore {
     rec.idleHeldByCrew = false;
     rec.hookBlockedSince = new Date().toISOString();
     const p = rec.session.persona;
-    rec.session.statusLine = phrase(p.voice, p.name, { kind: "idle" });
+    this.updateStatusLine(rec, phrase(p.voice, p.name, { kind: "idle" }));
     this.deps.log.add(p, "idle", rec.session.statusLine);
     this.deps.logger?.info("session", "idle   ", p.name, "crew done");
   }
@@ -1286,20 +1284,29 @@ export class SessionStore {
     this.mirrorToParent(rec);
   }
 
+  private updateStatusLine(rec: SessionRecord, line: string, target?: string) {
+    rec.session.statusLine = line;
+    rec.session.statusTarget = target;
+  }
+
   /**
    * Tool churn can be tens of events a second across sessions. We coalesce to
    * one session + one activity event per 250ms per session (trailing edge) so
    * the UI always ends up with the latest line without drowning. A trailing
    * edge with no line pushes the session only (crew counters changed).
    */
-  private emitActivity(rec: SessionRecord, line: string | undefined) {
+  private emitActivity(rec: SessionRecord, line: string | undefined, target?: string) {
     const id = rec.session.id;
     const at = new Date().toISOString();
-    const fresh = line !== undefined && line !== this.lastLine.get(id);
-    if (fresh) this.lastLine.set(id, line);
+    const activityTarget =
+      target ?? (line === rec.session.statusLine ? rec.session.statusTarget : undefined);
+    const previous = this.lastLine.get(id);
+    const fresh =
+      line !== undefined && (line !== previous?.line || activityTarget !== previous?.target);
+    if (fresh) this.lastLine.set(id, { line, target: activityTarget });
     const existing = this.throttles.get(id);
     if (existing) {
-      if (fresh) existing.lines.push({ line, at });
+      if (fresh) existing.lines.push({ line, at, target: activityTarget });
       return;
     }
     const timer = setTimeout(() => {
@@ -1313,12 +1320,18 @@ export class SessionStore {
       // Every distinct line goes out (history wants them all); only the session
       // snapshot is coalesced.
       for (const l of t.lines) {
-        this.deps.emit({ type: "activity", sessionId: id, line: l.line, at: l.at });
+        this.deps.emit({
+          type: "activity",
+          sessionId: id,
+          line: l.line,
+          target: l.target,
+          at: l.at,
+        });
       }
       this.mirrorToParent(current);
     }, ACTIVITY_THROTTLE_MS);
     timer.unref?.();
-    this.throttles.set(id, { timer, lines: fresh ? [{ line, at }] : [] });
+    this.throttles.set(id, { timer, lines: fresh ? [{ line, at, target: activityTarget }] : [] });
   }
 }
 

@@ -6,6 +6,7 @@ export const ACTIVITY_CAP = 80;
 export interface ActivityLine {
   at: string;
   line: string;
+  target?: string;
 }
 
 /**
@@ -19,19 +20,25 @@ export class ActivityStore {
 
   constructor(private db: Database) {
     const rows = db
-      .query<{ session_id: string; at: string; line: string }, []>(
-        "SELECT session_id, at, line FROM activity ORDER BY at, rowid",
+      .query<{ session_id: string; at: string; line: string; target: string | null }, []>(
+        "SELECT session_id, at, line, target FROM activity ORDER BY at, rowid",
       )
       .all();
-    for (const r of rows) this.push(r.session_id, { at: r.at, line: r.line });
+    for (const r of rows)
+      this.push(r.session_id, {
+        at: r.at,
+        line: r.line,
+        ...(r.target === null ? {} : { target: r.target }),
+      });
   }
 
   add(sessionId: string, entry: ActivityLine) {
     this.push(sessionId, entry);
-    this.db.run("INSERT INTO activity (session_id, at, line) VALUES (?, ?, ?)", [
+    this.db.run("INSERT INTO activity (session_id, at, line, target) VALUES (?, ?, ?, ?)", [
       sessionId,
       entry.at,
       entry.line,
+      entry.target ?? null,
     ]);
     // Trim the table in batches rather than on every insert.
     const n = (this.sincePrune.get(sessionId) ?? 0) + 1;

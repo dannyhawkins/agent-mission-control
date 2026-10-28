@@ -119,12 +119,13 @@ describe("reduce", () => {
     const at = "2026-09-25T10:05:00.000Z";
     const s = run([
       { type: "session", session: session("a") },
-      { type: "activity", sessionId: "a", line: "Reading · x.ts", at },
+      { type: "activity", sessionId: "a", line: "Reading · x.ts", target: "x.ts", at },
     ]);
     expect(s.sessions.a?.statusLine).toBe("Reading · x.ts");
+    expect(s.sessions.a?.statusTarget).toBe("x.ts");
     expect(s.sessions.a?.lastSeenAt).toBe(at);
     expect(s.activity.a).toBe(Date.parse(at));
-    expect(s.recent.a).toEqual([{ at, line: "Reading · x.ts" }]);
+    expect(s.recent.a).toEqual([{ at, line: "Reading · x.ts", target: "x.ts" }]);
   });
 
   test("activity for an unknown session still records scrollback; a bad timestamp pulses now", () => {

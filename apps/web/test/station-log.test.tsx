@@ -29,6 +29,32 @@ function renderStation(s: Session, decisions: Decision[] = [], extra = {}) {
 }
 
 describe("Station", () => {
+  test("multi-answer punctuation stays plain in the ticker and scrollback", () => {
+    const line = 'Aye aye. "Export: Yes · Tab: No" it is.';
+    const { container } = renderStation(session("a", { statusLine: line }), [], {
+      recent: [{ at: "2026-09-25T09:59:00.000Z", line }],
+    });
+    expect(container.querySelectorAll(".act__target")).toHaveLength(0);
+    expect(screen.getAllByText(line)).toHaveLength(2);
+  });
+
+  test("old activity without explicit target metadata stays readable without guessed emphasis", () => {
+    const line = "Reading · old-file.ts";
+    const { container } = renderStation(session("a", { statusLine: line }));
+    expect(container.querySelectorAll(".act__target")).toHaveLength(0);
+    expect(screen.getByText(line)).toBeDefined();
+  });
+
+  test("an explicit target can itself contain middle dots", () => {
+    renderStation(
+      session("a", {
+        statusLine: "Reading · report · final.md",
+        statusTarget: "report · final.md",
+      }),
+    );
+    expect(screen.getByText("report · final.md").className).toBe("act__target");
+  });
+
   test("a pending card makes the station wait whatever the hub status says", () => {
     expect(effectiveStatus("idle", [decision("d", "a")])).toBe("waiting_decision");
     expect(effectiveStatus("working", [decision("d", "a", { source: "permission" })])).toBe(
@@ -87,8 +113,8 @@ describe("Station", () => {
     });
     renderStation(s, [], {
       recent: [
-        { at: "2026-09-25T09:59:00.000Z", line: "Explore: Reading · src/a.ts" },
-        { at: "2026-09-25T09:59:30.000Z", line: "✗ Bash failed · bun test" },
+        { at: "2026-09-25T09:59:00.000Z", line: "Explore: Reading · src/a.ts", target: "src/a.ts" },
+        { at: "2026-09-25T09:59:30.000Z", line: "✗ Bash failed · bun test", target: "bun test" },
       ],
     });
     const list = screen.getByRole("list", { name: "Recent activity" });

@@ -102,6 +102,8 @@ Personas are generated deterministically from the session id by the hub on `Sess
 
 Each station also has an activity history: one line per tool call, in the persona's voice plus the specific target after " · " (a file relative to the session's cwd, a command's description or first 60 characters with anything secret-looking masked, a search pattern, a URL host and path, an MCP tool name), and a "✗ ... failed" line when a call fails. The hub keeps the last 80 lines per session in memory and SQLite and serves them in the snapshot as `recentActivity`, so history survives a page reload or hub restart.
 
+Tool activity carries an optional `target` alongside the full readable `line`; the current session line carries `statusTarget`. The UI emphasizes only that explicit target, so middle dots in answer summaries remain ordinary text. Opening an existing database adds a nullable activity target column without changing its rows. History from older hubs or databases remains readable as plain text, with no inferred target emphasis.
+
 The mission log records every session start and end, decision requested, answered or expired, permission prompt, idle and stop event. The UI shows the most recent 200 on load and streams the rest over the WebSocket. Decisions are never deleted, so the log doubles as the history of every call made.
 
 ## Security

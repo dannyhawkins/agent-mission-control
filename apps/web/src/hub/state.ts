@@ -3,6 +3,7 @@ import type { Decision, LogEntry, ServerEvent, Session } from "@amc/shared";
 export interface ActivityLine {
   at: string;
   line: string;
+  target?: string;
 }
 
 export interface HubState {
@@ -107,12 +108,21 @@ export function reduce(state: HubState, ev: ServerEvent): HubState {
     case "activity": {
       const s = state.sessions[ev.sessionId];
       const sessions = s
-        ? { ...state.sessions, [ev.sessionId]: { ...s, statusLine: ev.line, lastSeenAt: ev.at } }
+        ? {
+            ...state.sessions,
+            [ev.sessionId]: {
+              ...s,
+              statusLine: ev.line,
+              statusTarget: ev.target,
+              lastSeenAt: ev.at,
+            },
+          }
         : state.sessions;
       const at = Date.parse(ev.at);
-      const recent = [...(state.recent[ev.sessionId] ?? []), { at: ev.at, line: ev.line }].slice(
-        -RECENT_CAP,
-      );
+      const recent = [
+        ...(state.recent[ev.sessionId] ?? []),
+        { at: ev.at, line: ev.line, ...(ev.target === undefined ? {} : { target: ev.target }) },
+      ].slice(-RECENT_CAP);
       return {
         ...state,
         sessions,
