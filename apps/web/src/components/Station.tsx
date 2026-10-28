@@ -49,25 +49,26 @@ function spriteState(status: Session["status"], tier: EscalationTier): SpriteSta
 }
 
 /** Tints a leading "Role: " when it names a crew member; anything else renders untouched. */
-function CrewLine({ line, crew }: { line: string; crew: CrewMember[] }) {
+function CrewLine({ line, target, crew }: { line: string; target?: string; crew: CrewMember[] }) {
   const split = splitRolePrefix(line, crew);
-  if (!split) return <ActivityText line={line} />;
+  if (!split) return <ActivityText line={line} target={target} />;
   return (
     <>
       <span className="ticker__role">{split.prefix}</span>
-      <ActivityText line={split.rest} />
+      <ActivityText line={split.rest} target={target} />
     </>
   );
 }
 
 /**
- * Hub activity lines are "voice phrase · target" (one per tool call) or "✗ Tool failed · target".
+ * The hub marks tool targets explicitly; punctuation inside narration is ordinary text.
  * The target is the fact you scan for, so it gets full ink; the persona voice stays quiet.
  */
-function ActivityText({ line }: { line: string }) {
+function ActivityText({ line, target }: { line: string; target?: string }) {
   const failed = line.startsWith("✗");
   const body = failed ? line.slice(1).trimStart() : line;
-  const cut = body.indexOf(" · ");
+  const cut =
+    target !== undefined && body.endsWith(` · ${target}`) ? body.length - target.length - 3 : -1;
   return (
     <>
       {failed && <span className="act__fail">✗ </span>}
@@ -196,7 +197,11 @@ export function Station(p: Props) {
 
       <div className="screen">
         <div className="ticker" key={s.statusLine} title={s.statusLine}>
-          {s.statusLine ? <CrewLine line={s.statusLine} crew={crew} /> : "..."}
+          {s.statusLine ? (
+            <CrewLine line={s.statusLine} target={s.statusTarget} crew={crew} />
+          ) : (
+            "..."
+          )}
         </div>
         <div className="signal" aria-hidden="true">
           <i key={pulseKey} data-live={pulseKey ? "" : undefined} />
@@ -247,7 +252,7 @@ export function Station(p: Props) {
               <li key={`${a.at}${a.line}`}>
                 <span className="scrollback__time">{fmtTime(a.at)}</span>
                 <span>
-                  <CrewLine line={a.line} crew={crew} />
+                  <CrewLine line={a.line} target={a.target} crew={crew} />
                 </span>
               </li>
             ))}

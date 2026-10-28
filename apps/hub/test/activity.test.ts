@@ -1,10 +1,57 @@
+import { Database } from "bun:sqlite";
 import { afterEach, describe, expect, test } from "bun:test";
+import fs from "node:fs";
 import os from "node:os";
+import path from "node:path";
+import { ActivityStore } from "../src/activity";
+import { openDb } from "../src/db";
 import { maskSecrets, toolTarget } from "../src/detail";
 import { restartTestHub, sleep, startTestHub, type TestHub } from "./helpers";
 
 const CWD = "/Users/u/Code/amc";
 const SID = "aaaaaaaa-aaaa-bbbb-cccc-00000000000a";
+
+test("activity target metadata survives reloading the store", () => {
+  const db = new Database(":memory:");
+  db.exec("CREATE TABLE activity (session_id TEXT, at TEXT, line TEXT, target TEXT)");
+  try {
+    const entry = {
+      at: "2026-09-25T09:59:00.000Z",
+      line: "Reading · src/a.ts",
+      target: "src/a.ts",
+    };
+    new ActivityStore(db).add(SID, entry);
+    expect(new ActivityStore(db).recent([SID])[SID]).toEqual([entry]);
+  } finally {
+    db.close();
+  }
+});
+
+test("opening a legacy activity database preserves its rows and adds nullable targets", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "amc-legacy-activity-"));
+  const legacy = new Database(path.join(dir, "amc.db"), { create: true });
+  legacy.exec(
+    "CREATE TABLE activity (session_id TEXT NOT NULL, at TEXT NOT NULL, line TEXT NOT NULL)",
+  );
+  legacy.run("INSERT INTO activity VALUES (?, ?, ?)", [
+    SID,
+    "2026-09-25T09:59:00.000Z",
+    "Reading · old.ts",
+  ]);
+  legacy.close();
+  const db = openDb(dir);
+  try {
+    expect(new ActivityStore(db).recent([SID])[SID]).toEqual([
+      { at: "2026-09-25T09:59:00.000Z", line: "Reading · old.ts" },
+    ]);
+    const entry = { at: "2026-09-25T10:00:00.000Z", line: "Reading · new.ts", target: "new.ts" };
+    new ActivityStore(db).add(SID, entry);
+    expect(new ActivityStore(db).recent([SID])[SID]?.at(-1)).toEqual(entry);
+  } finally {
+    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 describe("toolTarget", () => {
   test("files relative to the session cwd, else ~-shortened", () => {
@@ -103,6 +150,18 @@ describe("station history", () => {
     expect(lines[2]).toBe("✗ Bash failed · bun test apps/hub");
     expect(lines[3]).toStartWith("Explore: ");
     expect(lines[3]).toEndWith(' · "RECENT_CAP"');
+    expect((await t.state()).recentActivity?.[SID]?.map((a) => a.target)).toEqual([
+      "docs/runbook.md",
+      "bun test apps/hub",
+      "bun test apps/hub",
+      '"RECENT_CAP"',
+    ]);
+    expect((await t.state()).sessions.find((s) => s.id === SID)?.statusTarget).toBe(
+      "bun test apps/hub",
+    );
+
+    await t.hook("UserPromptSubmit", 1, { session_id: SID });
+    expect((await t.state()).sessions.find((s) => s.id === SID)?.statusTarget).toBeUndefined();
 
     // Survives a hub restart.
     t = restartTestHub(t);

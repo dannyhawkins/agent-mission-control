@@ -70,6 +70,8 @@ export interface Session {
   lastTool?: string;
   /** Rolling activity line, phrased by the hub in the persona's voice. */
   statusLine: string;
+  /** Explicit tool target within statusLine; absent on narration and older hubs. */
+  statusTarget?: string;
   /** Aggregates from OTLP metrics if enabled. */
   stats: {
     toolCalls: number;
@@ -303,7 +305,7 @@ export interface StateSnapshot {
    * per-station history. Only sessions in `sessions` are included. Absent from
    * older hubs.
    */
-  recentActivity?: Record<string, { at: string; line: string }[]>;
+  recentActivity?: Record<string, { at: string; line: string; target?: string }[]>;
   serverTime: string;
 }
 
@@ -411,7 +413,7 @@ export type ServerEvent =
   | { type: "session_removed"; sessionId: string }
   | { type: "decision"; decision: Decision }
   | { type: "log"; entry: LogEntry }
-  | { type: "activity"; sessionId: string; line: string; at: string }; // high-frequency, not logged
+  | { type: "activity"; sessionId: string; line: string; target?: string; at: string }; // high-frequency, not logged
 
 // ───────────────────────────────────────────────────────────────────────────
 // OTLP  (hub accepts OTLP/HTTP JSON on /v1/logs, /v1/metrics, /v1/traces)

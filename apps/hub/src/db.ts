@@ -5,7 +5,7 @@ import path from "node:path";
 /**
  * Everything is stored as JSON blobs keyed by id. The hub keeps sessions and
  * decisions in memory and writes through, so the db only needs to be a durable
- * mirror plus a queryable log. Migrations are just CREATE IF NOT EXISTS; if a
+ * mirror plus a queryable log. Additive columns preserve existing rows; if a
  * shape changes incompatibly, bump the file name (amc.db -> amc2.db).
  */
 export function openDb(dataDir: string): Database {
@@ -47,5 +47,9 @@ export function openDb(dataDir: string): Database {
     );
     CREATE INDEX IF NOT EXISTS activity_session ON activity(session_id, at);
   `);
+  const activityColumns = db.query<{ name: string }, []>("PRAGMA table_info(activity)").all();
+  if (!activityColumns.some((column) => column.name === "target")) {
+    db.exec("ALTER TABLE activity ADD COLUMN target TEXT");
+  }
   return db;
 }
